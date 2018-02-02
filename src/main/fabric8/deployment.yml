@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: ${project.artifactId}
+  labels:
+    application: das-service
+spec:
+  template:
+    spec:
+      containers:
+        - env:
+            - name: DB_USERNAME
+              valueFrom:
+                 secretKeyRef:
+                   name: postgresql-persistent-plthb-credentials-3kcma
+                   key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                 secretKeyRef:
+                   name: postgresql-persistent-plthb-credentials-3kcma
+                   key: password
+            - name: DATABASE_NAME
+              valueFrom:
+                 secretKeyRef:
+                   name: postgresql-persistent-plthb-credentials-3kcma
+                   key: database_name
+            - name: JAVA_OPTIONS
+              value: "-Dswarm.datasources.data-sources.MyDS.connection-url=jdbc:postgresql://postgresql:5432/$(DATABASE_NAME) 
+                      -Dswarm.datasources.data-sources.MyDS.user-name=$(DB_USERNAME) 
+                      -Dswarm.datasources.data-sources.MyDS.password=$(DB_PASSWORD) 
+                      -Dswarm.datasources.data-sources.MyDS.driver-name=postgresql"
+                   
