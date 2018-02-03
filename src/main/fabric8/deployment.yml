@@ -12,17 +12,17 @@ spec:
             - name: DB_USERNAME
               valueFrom:
                  secretKeyRef:
-                   name: postgresql-persistent-plthb-credentials-3kcma
+                   name: postgresql
                    key: username
             - name: DB_PASSWORD
               valueFrom:
                  secretKeyRef:
-                   name: postgresql-persistent-plthb-credentials-3kcma
+                   name: postgresql
                    key: password
             - name: DATABASE_NAME
               valueFrom:
                  secretKeyRef:
-                   name: postgresql-persistent-plthb-credentials-3kcma
+                   name: postgresql
                    key: database_name
             - name: JAVA_OPTIONS
               value: "-Dswarm.datasources.data-sources.MyDS.connection-url=jdbc:postgresql://postgresql:5432/$(DATABASE_NAME) 
