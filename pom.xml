@@ -49,7 +49,7 @@
         <configuration>
           <arguments>
             <argument>-S</argument>
-            <argument>local</argument>
+            <argument>openshift</argument>
           </arguments>
         </configuration>
       </plugin>
@@ -70,6 +70,47 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>fabric8-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>resource</goal>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <generator>
+            <includes>
+              <include>wildfly-swarm</include>
+            </includes>
+            <excludes>
+              <exclude>webapp</exclude>
+            </excludes>
+          </generator>
+          <enricher>
+            <config>
+              <wildfly-swarm-health-check>
+                <path>/</path>
+              </wildfly-swarm-health-check>
+            </config>
+          </enricher>
+          <!-- 
+        <resources>
+          <labels>
+            <pod>
+              <property>
+                <name>role</name>
+                <value>teiid-data-source-consumer</value>
+              </property>
+            </pod>                                
+          </labels>
+        </resources>
+          -->
+        </configuration>
+      </plugin>      
     </plugins>
   </build>
   <dependencies>
@@ -92,62 +133,4 @@
       <artifactId>teiid-jdbc</artifactId>
     </dependency>
   </dependencies>
-  <profiles>
-    <profile>
-      <id>openshift</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>io.fabric8</groupId>
-            <artifactId>fabric8-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>resource</goal>
-                  <goal>build</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <generator>
-                <includes>
-                  <include>wildfly-swarm</include>
-                </includes>
-                <excludes>
-                  <exclude>webapp</exclude>
-                </excludes>
-              </generator>
-              <enricher>
-                <config>
-                  <wildfly-swarm-health-check>
-                    <path>/</path>
-                  </wildfly-swarm-health-check>
-                </config>
-              </enricher>
-              <!-- 
-            <resources>
-              <labels>
-                <pod>
-                  <property>
-                    <name>role</name>
-                    <value>teiid-data-source-consumer</value>
-                  </property>
-                </pod>                                
-              </labels>
-            </resources>
-              -->
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skipTests>true</skipTests>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-      <activation />
-    </profile>
-  </profiles>
 </project>
