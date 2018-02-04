@@ -9,24 +9,29 @@ spec:
     spec:
       containers:
         - env:
+            - name: "AB_OFF"
+              value: "true"
+            - name: "AB_JOLOKIA_OFF"
+              value: "true"
             - name: DB_USERNAME
               valueFrom:
                  secretKeyRef:
                    name: postgresql
-                   key: username
+                   key: database-user
             - name: DB_PASSWORD
               valueFrom:
                  secretKeyRef:
                    name: postgresql
-                   key: password
+                   key: database-password
             - name: DATABASE_NAME
               valueFrom:
                  secretKeyRef:
                    name: postgresql
-                   key: database_name
+                   key: database-name
             - name: JAVA_OPTIONS
               value: "-Dswarm.datasources.data-sources.MyDS.connection-url=jdbc:postgresql://postgresql:5432/$(DATABASE_NAME) 
                       -Dswarm.datasources.data-sources.MyDS.user-name=$(DB_USERNAME) 
                       -Dswarm.datasources.data-sources.MyDS.password=$(DB_PASSWORD) 
-                      -Dswarm.datasources.data-sources.MyDS.driver-name=postgresql"
-                   
+                      -Dswarm.datasources.data-sources.MyDS.driver-name=postgresql
+                      -DAB_JOLOKIA_OFF=true"
+                                         
