@@ -5,6 +5,7 @@
 
     <model name="Accounts">
         <property name="importer.useFullSchemaName" value="false"/>
+        <property name="importer.schemaPattern" value="public"/>
         <source name="openshift" translator-name="postgresql" connection-jndi-name="java:jboss/datasources/MyDS"/>
     </model>
 

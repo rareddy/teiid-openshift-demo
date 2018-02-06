@@ -11,7 +11,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.io.fabric8>3.5.34</version.io.fabric8>
+    <version.io.fabric8>3.5.25</version.io.fabric8>
     <version.h2>1.4.196</version.h2>
     <version.teiid>10.0.0.Final</version.teiid>
     <version.postgresql>9.4.1207</version.postgresql>
@@ -144,5 +144,11 @@
       <groupId>org.wildfly.swarm</groupId>
       <artifactId>teiid-jdbc</artifactId>
     </dependency>
+<!--
+    <dependency>
+      <groupId>org.wildfly.swarm</groupId>
+      <artifactId>odata</artifactId>
+    </dependency> 
+-->
   </dependencies>
 </project>
