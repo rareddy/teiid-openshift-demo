@@ -15,7 +15,6 @@
     <version.h2>1.4.196</version.h2>
     <version.teiid>10.0.0.Final</version.teiid>
     <version.postgresql>9.4.1207</version.postgresql>
-    <version.h2>1.4.196</version.h2>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -132,11 +131,6 @@
       <version>${version.postgresql}</version>
     </dependency>
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>${version.h2}</version>
-    </dependency>
-    <dependency>
       <groupId>org.wildfly.swarm</groupId>
       <artifactId>teiid</artifactId>
     </dependency>
@@ -147,6 +141,10 @@
     <dependency>
       <groupId>org.wildfly.swarm</groupId>
       <artifactId>odata</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.wildfly.swarm</groupId>
+        <artifactId>management</artifactId>
     </dependency>
   </dependencies>
 </project>

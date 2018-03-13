@@ -16,22 +16,56 @@ spec:
             - name: DB_USERNAME
               valueFrom:
                  secretKeyRef:
-                   name: postgresql
+                   name: pg-secret
                    key: database-user
             - name: DB_PASSWORD
               valueFrom:
                  secretKeyRef:
-                   name: postgresql
+                   name: pg-secret
                    key: database-password
             - name: DATABASE_NAME
               valueFrom:
                  secretKeyRef:
-                   name: postgresql
+                   name: pg-secret
                    key: database-name
+            - name: DATABASE_SERVICE
+              valueFrom:
+                 secretKeyRef:
+                   name: pg-secret
+                   key: database-service                   
             - name: JAVA_OPTIONS
-              value: "-Dswarm.datasources.data-sources.MyDS.connection-url=jdbc:postgresql://postgresql:5432/$(DATABASE_NAME) 
-                      -Dswarm.datasources.data-sources.MyDS.user-name=$(DB_USERNAME) 
-                      -Dswarm.datasources.data-sources.MyDS.password=$(DB_PASSWORD) 
-                      -Dswarm.datasources.data-sources.MyDS.driver-name=postgresql
+              value: "-Dswarm.datasources.data-sources.pgDS.connection-url=jdbc:postgresql://$(DATABASE_SERVICE):5432/$(DATABASE_NAME) 
+                      -Dswarm.datasources.data-sources.pgDS.user-name=$(DB_USERNAME) 
+                      -Dswarm.datasources.data-sources.pgDS.password=$(DB_PASSWORD) 
+                      -Dswarm.datasources.data-sources.pgDS.driver-name=postgresql
                       -DAB_JOLOKIA_OFF=true"
-                                         
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - '-i'
+                - '-c'
+                - >-
+                  curl -s -X POST -d '{"operation": "get-vdb", "vdb-name": "${project.artifactId}","vdb-version": "${project.version}", "address": ["subsystem","teiid"], "json.pretty":1}' 
+                  -H 'Content-Type: application/json' http://127.0.0.1:9990/management
+                  | grep '"status" : "ACTIVE"'
+            initialDelaySeconds: 30
+            timeoutSeconds: 80
+            periodSeconds: 60
+            successThreshold: 1
+            failureThreshold: 5
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - '-i'
+                - '-c'
+                - >-
+                  curl -X POST -d '{"operation": "execute-query", "vdb-name": "${project.artifactId}","vdb-version": "${project.version}", "sql-query": "select 1", "timeout-in-milli": 100, "address": ["subsystem","teiid"], "json.pretty":1}' 
+                  -H 'Content-Type: application/json' http://127.0.0.1:9990/management
+                  | grep '"outcome" : "success"'
+            initialDelaySeconds: 60
+            timeoutSeconds: 80
+            periodSeconds: 60
+            successThreshold: 1
+            failureThreshold: 5

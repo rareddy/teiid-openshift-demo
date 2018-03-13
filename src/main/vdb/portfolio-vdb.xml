@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<vdb name="Portfolio" version="1">
+<vdb name="teiid-openshift-demo" version="1.0.0">
 
     <description>The Portfolio VDB</description>
 
     <model name="Accounts">
         <property name="importer.useFullSchemaName" value="false"/>
         <property name="importer.schemaPattern" value="public"/>
-        <source name="openshift" translator-name="postgresql" connection-jndi-name="java:jboss/datasources/MyDS"/>
+        <property name="importer.catalog" value="sampledb"/>
+        <property name="importer.tableTypes" value="TABLE,VIEW"/>
+        <source name="my-pg-source" translator-name="postgresql" connection-jndi-name="java:jboss/datasources/pgDS"/>
     </model>
 
 </vdb>

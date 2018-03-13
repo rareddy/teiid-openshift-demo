@@ -1,103 +1,79 @@
-# teiid-openshift-demo
-Teiid OpenShift based Demo Project based on WilFly Swarm
+# Teiid Openshift Demo
+
+This execute this sample project requires basic knowledge in
+* OpenShift
+* Teiid
+* Maven
+* Wildfly-Swarm (preferable not required)
 
 ## Introduction
-This project serves as an example how to quickly set up a microservice using Teiid. It shows how to deploy your VDB using Fabric8 Maven Plugin as a Swarm microservice to OpenShift.
-These are necessary steps if you want to use this project as a starting point for your use case. 
+This project serves as an example how to set up a MicroService using Teiid. It shows how to configure and deploy your VDB using Fabric8 Maven Plugin using WildFly-Swarm based Teiid as MicroService in OpenShift. 
+
+This project will show you 
+* Build WildFly-Swarm based Teiid (WFST) instance based Maven pom.xml file.
+* Configure to deploy a -vdb.xml given into the WFST
+* Configure the connection details for your Data Source(s)
+* Configure OData route.
+
+## Pre-Requisites
+Before you begin, you must have access to OpenShift Dedicated cluster, or `minishift` or `oc cluster up` running and have access the the instance.
+
 * Start your OpenShift or MiniShift.
-* Log into OpenShift using
+* Log into OpenShift using on the command line. 
     ```
     $ oc login host:port
     ```
-* Place the -vdb.xml in the `src/main/vdb` folder.
-* Create `deployment.yml` in the `src/main/fabric8` folder. This will contain all the properties to create the data sources. Note that you need to create the necessary datasources before and gather the required "secret" names and property names.
-* The create `route.yml` and `service.yml` for each of JDBC and OData
-* Add any jdbc drivers or resource-adapters based the VDB you are deploying to the pom.xml. For example to enable support for MongoDB, you would add
-    ```xml
-    <dependency>
-      <groupId>org.wildfly.swarm</groupId>
-      <artifactId>teiid-mongodb</artifactId>
-    </dependency>
-    ```
-* If you are enabling OData then add
-    ```xml
-    <dependency>
-      <groupId>org.wildfly.swarm</groupId>
-      <artifactId>odata</artifactId>
-    </dependency>
-    ```
-* Execute following command to deploy custom Teiid image to the OpenShift.
-    ```
-    $ mvn clean fabric8:deploy -Popenshift
-    ```
-* NOTE: If you only need to review the resulting contents to be deployed you can run following command and review contents of the `target` directory.
-    ```
-    $ mvn clean package -Popenshift
-    ```
+* Using the Service Catalog create all the data sources required by your VDB. For this example we would need a PostgreSQL database. Using the https://host:port/console log into the OpenShift Web Console application.
+* Click on Postgresql database icon and create instance of it. Use user name "admin", with password "admin". Keep the database name as "sampledb". Do not need to bind yet.
+* Once the Posgresql instance is started and available, now lets populate it with some schema and data information. (At least one table is needed in `PUBLIC` schema within the DB.)
+* Goto menu "Applications/Pods" and find "postgres" pod and click on it.
+* Click on the "Terminal" tab
+* Execute
+```
+$ psql -U admin -W sampledb
+Password for user admin:xxxx
+```
+$ Now paste your DDL/DML contents into the window. For Example: 
+```sql
+CREATE TABLE  PRODUCT (
+   ID integer,
+   SYMBOL varchar(16),
+   COMPANY_NAME varchar(256),
+   PRIMARY KEY(ID)
+);
+INSERT INTO PRODUCT (ID,SYMBOL,COMPANY_NAME) VALUES(1002,'BA','The Boeing Company');
+INSERT INTO PRODUCT (ID,SYMBOL,COMPANY_NAME) VALUES(1003,'MON','Monsanto Company');
+```
+Note: There are alternate ways to connect to pod. For example, you can use `oc rsh <pod-name>` and you will be presented with same console as above process. The process of executing `pql` command and DDL/DML after is exactly same. 
 
-## Example using PostgreSQL
-### Prerequisite
-* Running OpenShift or MiniShift instance.
-* User is logged in via `oc`.
-* NOTE: The project name for this example is `teiid-os-demo`.
-### Instructions
-* Create a postgresql application:
-    ```
-    $ oc new-app postgresql -e POSTGRESQL_USER=user \
-    -e POSTGRESQL_PASSWORD=password \
-    -e POSTGRESQL_DATABASE=komododb
-    ```
-* Store the credentials as a secret in OpenShift:
-  * Create a file `postgresql-secret.yml` with following contents:
-    ```yaml
-    apiVersion: v1
-    metadata:
-      name: postgresql
-      namespace: teiid-os-demo
-    stringData:
-      database-name: komododb
-      database-password: password
-      database-user: user
-    kind: Secret
-    ```
-  * Create the secret in OpenShift:
-    ```
-    $ oc create -f postgresql-secret.yml
-    ```
-* Create a table in the PostgreSQL instance. (At least one table is needed in `PUBLIC` schema within the DB.)
-    * List your pods and note the postgresql pod:
-        ```
-        $ oc get pods
-        ```
-    * Connect to your pod via shell:
-        ```
-        $ oc rsh <podname>
-        ```
-    * Via `psql` run following queries:
-        ```sql
-        CREATE TABLE usr(id integer PRIMARY KEY, name varchar(30));
-        INSERT INTO usr(id, name) VALUES (1, 'Jan'), (2, 'Andrej');
-        ```
-        * NOTE: make sure you connect to your database by providing the name:
-            ```
-            $ psql -U user -d komododb
-            ```
-* See `deployment.yml` descriptor placed in `src/main/fabric8` folder to see, how the resulting image is being configured.
-    * NOTE: You can use parameters within this file that will be resolved during the maven build. This might come handy if you want to parameterize the jdbc url by various service names. You can create variable `${db.hostname}`:
-        ```
-        ...
-        -Dswarm.datasources.data-sources.MyDS.connection-url=jdbc:postgresql://${db.hostname}:5432/$(DATABASE_NAME)
-        ...
-        ```
-        and provide the value only when running Maven:
-        ```
-        $ mvn <goal> -Popenshift -Ddb.hostname=postgresql_x_y
-        ```
-* For a services and routes definitions see `src/main/fabric8` folder.
-* Deploy the service into OpenShift:
-    ```
-    mvn clean fabric8:deploy -Popenshift
-    ```
-* Check your OpenShift project for a new Deployment.
-    * Try accessing odata4 interface. The odata web context will be `/odata4/Portfolio/Accounts/usr`.
+## Example
+* Make a clone of this project, and edit pom.xml with your name of the project.
+* Place the -vdb.xml in the `src/main/vdb` folder. Note that the VDB name MUST match to the ${project.artifactId} and vdb version must match to the ${project.version}.
+* Create a file like `pg-secret.yml` file in `src/main/fabric8` folder to define the credentials you set in the above Postgresql database. Note that the values are base64 encoded. You can use command like `echo admin | base64` to encode. Note that different data sources need different types of properties. Consult Teiid documents for required properties.
+* Create `deployment.yml` in the `src/main/fabric8` folder. This will contain all the properties to create the data sources. Note that you need to create the necessary datasources before and gather the required "secret" names and property names. Change/add the properties in this file according to your configuration. 
+* Edit service and route files accordingly 
+* Add any jdbc drivers or resource-adapters based the VDB you are deploying to the pom.xml. For example to enable support for Postgresql, you would add in <dependencies> section the following maven configuration for Postgresql JDBC driver
+
+```xml
+<dependency>
+  <groupId>org.postgresql</groupId>
+  <artifactId>postgresql</artifactId>
+  <version>${version.postgresql}</version>
+</dependency>
+```
+
+* If you are enabling OData then add
+
+```xml
+<dependency>
+  <groupId>org.wildfly.swarm</groupId>
+  <artifactId>odata</artifactId>
+</dependency>
+```
+* Execute following command to deploy custom Teiid image to the OpenShift.
+```
+$ mvn clean fabric8:deploy -Popenshift
+```
+
+Once the build is completed, go back OpenShift web-console application and make sure you do not have any errors with deployment. Now go to "Applications/Routes" and find the OData endpoint for your service and append  `/odata4/Portfolio/Accounts/PRODUCT` to see the PRODUCT table data.
 
