@@ -75,5 +75,5 @@ Note: There are alternate ways to connect to pod. For example, you can use `oc r
 $ mvn clean fabric8:deploy -Popenshift
 ```
 
-Once the build is completed, go back OpenShift web-console application and make sure you do not have any errors with deployment. Now go to "Applications/Routes" and find the OData endpoint for your service and append  `/odata4/Portfolio/Accounts/PRODUCT` to see the PRODUCT table data.
+Once the build is completed, go back OpenShift web-console application and make sure you do not have any errors with deployment. Now go to "Applications/Routes" and find the OData endpoint for your service and append  `/odata4/teiid-openshift-demo/accounts/product` to see the PRODUCT table data. For ex: http://teiid-openshift-demo-odata-myproject.192.168.42.70.nip.io/odata4/teiid-openshift-demo/accounts/product
 
