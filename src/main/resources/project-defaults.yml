@@ -1,0 +1,11 @@
+swarm:
+  teiid:
+    odata:
+      secured: true
+  datasources:
+    data-sources:
+      pgDS:
+        driver-name: postgresql
+        connection-url: jdbc:postgresql://localhost:5432/sampledb
+        user-name: admin
+        password: admin
