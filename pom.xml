@@ -3,16 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.example</groupId>
   <artifactId>teiid-openshift-demo</artifactId>
-  <name>Thorntail Based Teiid Example</name>
+  <name>Thorntail based Teiid Example</name>
   <version>1.0.0</version>
   <packaging>vdb</packaging>
   <properties>
     <version.thorntail>2.2.0.Final</version.thorntail>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.io.fabric8>3.5.38</version.io.fabric8>
-    <version.h2>1.4.196</version.h2>
+    <version.io.fabric8>3.5.41</version.io.fabric8>
     <version.postgresql>42.1.4</version.postgresql>
   </properties>
   <dependencyManagement>
@@ -82,11 +78,13 @@
         <version>${version.io.fabric8}</version>
         <executions>
           <execution>
+            <id>build</id>
             <goals>
               <goal>resource</goal>
               <goal>build</goal>
             </goals>
-          </execution>
+            <phase>package</phase>
+          </execution>          
         </executions>
         <configuration>
           <generator>

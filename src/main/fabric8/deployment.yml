@@ -3,8 +3,16 @@ kind: Deployment
 metadata:
   name: ${project.artifactId}
   labels:
-    application: das-service
+    application: ${project.artifactId}-service
 spec:
+  replicas: 1
+  strategy:
+    resources:
+      limits:
+        memory: "256Mi"
+      requests:
+        memory: "20Mi" 
+    type: Recreate 
   template:
     spec:
       containers:
